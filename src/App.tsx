@@ -5,6 +5,7 @@ import { SignIn } from "./components/views/sign-in/signin";
 import { User } from "./components/views/user/user";
 import { Welcome } from "./components/views/welcome/welcome";
 import "./css/global.css";
+import { setToken } from "./features/token/tokenSlice";
 import { setUser } from "./features/user/userSlice";
 import { loadFromSessionStorage } from "./store";
 
@@ -14,6 +15,7 @@ function App() {
 
   if (storage) {
     dispatch(setUser(storage.user));
+    dispatch(setToken(storage.token));
   }
 
   return (

@@ -4,7 +4,7 @@ import { Navigate } from "react-router-dom";
 import { setChanges } from "../../../features/changes/changesSlice";
 import { setUser } from "../../../features/user/userSlice";
 import { updateUser } from "../../../models/Api.service";
-import { updateSessionStorage } from "../../../store";
+import { loadFromSessionStorage, updateSessionStorage } from "../../../store";
 import { Header } from "../../modules/header/header";
 import styles from "./user.module.css";
 
@@ -45,6 +45,7 @@ export const User: React.FunctionComponent = () => {
       firstName: firstName,
       lastName: lastName,
     };
+    const isRemberMe = !!loadFromSessionStorage() || false;
 
     dispatch(
       setChanges({
@@ -52,7 +53,8 @@ export const User: React.FunctionComponent = () => {
       })
     );
     dispatch(setUser(newUser));
-    updateSessionStorage({ user: newUser });
+
+    isRemberMe && updateSessionStorage({ user: newUser });
     updateUser(newUser);
   };
 

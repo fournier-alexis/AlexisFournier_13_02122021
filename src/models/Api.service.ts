@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { loadFromSessionStorage } from '../store';
+import store from '../store';
 import { User } from '../types/User';
 
 export function login(email:string, password:string){
@@ -11,7 +11,8 @@ export function getUserProfile(token:string){
 }
 
 export function updateUser(newUser: User){
-  const token = loadFromSessionStorage()?.token
+  const token = store.getState().token.token;
+  
   return token && put(`${process.env.REACT_APP_BACKURL}/api/v1/user/profile`, newUser, token);
 }
 

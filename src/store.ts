@@ -2,12 +2,13 @@ import { configureStore } from '@reduxjs/toolkit'
 import userReducer from "./features/user/userSlice"
 import errorReducer from "./features/error/errorSlice"
 import changesReducer from "./features/changes/changesSlice"
+import tokenReducer from "./features/token/tokenSlice"
 import { STORAGE_KEY } from './constants';
 import { User } from './types/User';
 
 export type storeDatas = {
   user: User | null;
-  token?: string;
+  token: String | null;
 }
 
 export default configureStore({
@@ -15,6 +16,7 @@ export default configureStore({
         user: userReducer,
         error: errorReducer,
         changes: changesReducer,
+        token: tokenReducer,
     },
 })
 
@@ -27,13 +29,13 @@ export function saveToSessionStorage(datas: storeDatas): void {
   }
 }
 
-export function updateSessionStorage(newDatas: storeDatas): void {
+export function updateSessionStorage(newDatas: Partial<storeDatas>): void {
   const currentDatas: storeDatas | null = loadFromSessionStorage();
 
   if (currentDatas) {
     saveToSessionStorage({ ...currentDatas, ...newDatas });
   } else {
-    saveToSessionStorage(newDatas);
+    saveToSessionStorage({user: null, token: null , ...newDatas});
   }
 }
 

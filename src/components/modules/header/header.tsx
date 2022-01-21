@@ -37,7 +37,7 @@ export const Header: React.FunctionComponent = () => {
           </div>
         ) : (
           <div>
-            <Link className={styles["main-nav-item"]} to="/user">
+            <Link className={styles["main-nav-item"]} to="/profile">
               <i className="fa fa-user-circle"></i>
               {user.firstName}
             </Link>

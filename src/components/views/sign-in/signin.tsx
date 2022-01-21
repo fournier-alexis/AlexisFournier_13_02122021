@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setError } from "../../../features/error/errorSlice";
+import { setToken } from "../../../features/token/tokenSlice";
 import { setUser } from "../../../features/user/userSlice";
 import { getUserProfile, login } from "../../../models/Api.service";
 import { saveToSessionStorage } from "../../../store";
@@ -14,6 +15,7 @@ export const SignIn: React.FunctionComponent = () => {
   const HTMLEmail = useRef(null);
   const HTMLPassword = useRef(null);
   const navigate = useNavigate();
+  const rememberMe = useRef<HTMLInputElement>(null);
 
   const signIn = async () => {
     const email = HTMLEmail.current ? HTMLEmail.current["value"] : "";
@@ -30,14 +32,18 @@ export const SignIn: React.FunctionComponent = () => {
       })
     );
 
-    saveToSessionStorage({
-      user: {
-        email: email,
-        firstName: infos.body.firstName,
-        lastName: infos.body.lastName,
-      },
-      token: result.body.token,
-    });
+    dispatch(setToken(result.body.token));
+
+    if (rememberMe.current && rememberMe.current.checked) {
+      saveToSessionStorage({
+        user: {
+          email: email,
+          firstName: infos.body.firstName,
+          lastName: infos.body.lastName,
+        },
+        token: result.body.token,
+      });
+    }
   };
 
   return (
@@ -58,7 +64,7 @@ export const SignIn: React.FunctionComponent = () => {
               <input type="password" id="password" ref={HTMLPassword} />
             </div>
             <div className={styles["input-remember"]}>
-              <input type="checkbox" id="remember-me" />
+              <input ref={rememberMe} type="checkbox" id="remember-me" />
               <label htmlFor="remember-me">Remember me</label>
             </div>
             <button
