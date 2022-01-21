@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
 import { setChanges } from "../../../features/changes/changesSlice";
 import { setUser } from "../../../features/user/userSlice";
 import { updateUser } from "../../../models/Api.service";
@@ -7,9 +8,6 @@ import { updateSessionStorage } from "../../../store";
 import { Header } from "../../modules/header/header";
 import styles from "./user.module.css";
 
-/*
- * Regarder redux connect
- */
 export const User: React.FunctionComponent = () => {
   const dispatch = useDispatch();
   const user = useSelector((state: any) => state.user.user);
@@ -18,7 +16,7 @@ export const User: React.FunctionComponent = () => {
   const HTMLLastName = useRef(null);
 
   if (!user) {
-    window.location.href = "/";
+    return <Navigate to={"/"}></Navigate>;
   }
 
   const openEdit = () => {

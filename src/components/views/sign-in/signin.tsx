@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { setError } from "../../../features/error/errorSlice";
 import { setUser } from "../../../features/user/userSlice";
 import { getUserProfile, login } from "../../../models/Api.service";
@@ -13,46 +13,31 @@ export const SignIn: React.FunctionComponent = () => {
   const error = useSelector((state: any) => state.error.error);
   const HTMLEmail = useRef(null);
   const HTMLPassword = useRef(null);
+  const navigate = useNavigate();
 
-  const signIn = async (e: any) => {
+  const signIn = async () => {
     const email = HTMLEmail.current ? HTMLEmail.current["value"] : "";
     const password = HTMLPassword.current ? HTMLPassword.current["value"] : "";
 
-    e.preventDefault();
+    const result = await login(email, password);
+    const infos = await getUserProfile(result.body.token);
 
-    try {
-      const result = await login(email, password);
-      const infos = await getUserProfile(result.body.token);
+    dispatch(
+      setUser({
+        email: email,
+        firstName: infos.body.firstName,
+        lastName: infos.body.lastName,
+      })
+    );
 
-      dispatch(
-        setUser({
-          email: email,
-          firstName: infos.body.firstName,
-          lastName: infos.body.lastName,
-        })
-      );
-
-      saveToSessionStorage({
-        user: {
-          email: email,
-          firstName: infos.body.firstName,
-          lastName: infos.body.lastName,
-        },
-        token: result.body.token,
-      });
-
-      window.location.href = "/user";
-    } catch (error: any) {
-      const code = error.toString().match(/\d+/)[0];
-
-      switch (code) {
-        case "400":
-          dispatch(setError("Email ou Mot de passe incorrect"));
-          break;
-        case "500":
-          dispatch(setError("Erreur du serveur"));
-      }
-    }
+    saveToSessionStorage({
+      user: {
+        email: email,
+        firstName: infos.body.firstName,
+        lastName: infos.body.lastName,
+      },
+      token: result.body.token,
+    });
   };
 
   return (
@@ -76,15 +61,29 @@ export const SignIn: React.FunctionComponent = () => {
               <input type="checkbox" id="remember-me" />
               <label htmlFor="remember-me">Remember me</label>
             </div>
-            <Link
-              to="/user"
+            <button
               className={styles["sign-in-button"]}
               onClick={(e) => {
-                signIn(e);
+                e.preventDefault();
+                signIn()
+                  .then(() => {
+                    navigate("/profile");
+                  })
+                  .catch((error) => {
+                    const code = error.toString().match(/\d+/)[0];
+
+                    switch (code) {
+                      case "400":
+                        dispatch(setError("Email ou Mot de passe incorrect"));
+                        break;
+                      case "500":
+                        dispatch(setError("Erreur du serveur"));
+                    }
+                  });
               }}
             >
               Sign In
-            </Link>
+            </button>
           </form>
         </section>
       </main>
